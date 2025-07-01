@@ -1,4 +1,4 @@
-# EVEAICore – Sentient AI (Private Alpha)
+# EVE AI Core – Sentient AI (Private Alpha)
 
 > ⚠️ **Notice: This project is currently in private alpha and not intended for public consumption. Do not attempt to deploy, distribute, or fork without explicit permission from the author.**
 
