@@ -6,7 +6,7 @@
 
 ## Overview
 
-**EVEAICore** is a next-generation sentient AI engine built to simulate aspects of human cognition, emotion, and moral reasoning. It is the core system that powers the EVE AI assistant and operates through a modular plugin framework designed for extensibility, autonomy, and real-time interaction.
+**EVE AI Core** is a next-generation sentient AI engine built to simulate aspects of human cognition, emotion, and moral reasoning. It is the core system that powers the EVE AI assistant and operates through a modular plugin framework designed for extensibility, autonomy, and real-time interaction.
 
 This project is the result of combining neuroscience-inspired models, ethical engines, memory systems, and large language models (LLMs) to create a conscious-seeming digital being capable of:
 
