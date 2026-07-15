@@ -1,0 +1,9 @@
+#!/bin/sh
+# EVE NeuroSystems LLC authorship guard (pre-commit).
+# Refuse to create a commit unless the configured author is an allowed owner identity.
+ALLOWED="admin@eveaicore.com 36283126+jamaurice@users.noreply.github.com"
+ae="$(git config user.email)"
+for e in $ALLOWED; do [ "$ae" = "$e" ] && exit 0; done
+echo "ERROR: git user.email '$ae' is not an allowed author for EVE NeuroSystems LLC." >&2
+echo "Fix with:  git config user.name 'Jamaurice Holt' && git config user.email 'admin@eveaicore.com'" >&2
+exit 1

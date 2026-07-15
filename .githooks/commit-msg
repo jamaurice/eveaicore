@@ -1,0 +1,10 @@
+#!/bin/sh
+# EVE NeuroSystems LLC authorship guard (commit-msg).
+# Strip ALL Co-Authored-By / Signed-off-by trailers — no co-authors are permitted.
+f="$1"; tmp="$f.eve.tmp"
+if grep -viE '^[[:space:]]*(co-authored-by|signed-off-by)[[:space:]]*:' "$f" > "$tmp" 2>/dev/null && [ -s "$tmp" ]; then
+  mv "$tmp" "$f"
+else
+  rm -f "$tmp"
+fi
+exit 0
