@@ -2,19 +2,20 @@
 
 <img src="eve_logo.png" alt="EVE Logo" width="150" height="250"/>
 
-# EVE AI Core — Deterministic Governance Control Plane
+# EVE AI Core — AI Governance Platform (AIGP)
 
-### Pre-Execution Policy Enforcement for Autonomous AI Systems
+### Deterministic pre-execution runtime enforcement for enterprise AI risk management, with cryptographically signed, independently verifiable decision evidence
 
-[![Live Service](https://img.shields.io/badge/status-live-green.svg)](https://eveaicore.com)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Live Service](https://img.shields.io/badge/status-live-green.svg)](https://evecore.com)
+[![This repo: MIT](https://img.shields.io/badge/this%20repo-MIT-yellow.svg)](LICENSE)
+[![EVE platform: proprietary](https://img.shields.io/badge/EVE%20platform-proprietary-red.svg)](https://evecore.com/governance-license)
 [![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 [![Patent pending](https://img.shields.io/badge/USPTO-patent--pending-blue.svg)](#intellectual-property)
-[![Last updated](https://img.shields.io/badge/updated-2026--07--15-informational.svg)](#)
+[![Last updated](https://img.shields.io/badge/updated-2026--09--08-informational.svg)](#)
 
 **No AI action executes without passing through EVE's governance pipeline first.**
 
-**[Website](https://eveaicore.com)** · **[EVE CoreGuard](https://eveaicore.com/coreguard)** · **[Verify a signed record](https://eveaicore.com/proof)** · **[Pricing](https://eveaicore.com/pricing)** · **[Trust Center](https://eveaicore.com/trust-center)** · **[Whitepaper](https://eveaicore.com/whitepaper)**
+**[Website](https://evecore.com)** · **[EVE CoreGuard](https://evecore.com/coreguard)** · **[Verify a signed record](https://evecore.com/proof)** · **[Pricing](https://evecore.com/pricing)** · **[Trust Center](https://evecore.com/trust-center)** · **[Whitepaper](https://evecore.com/whitepaper)**
 
 [Why EVE](#why-eve-ai-core-is-different) | [Architecture](#architecture) | [Governance Engine](#governance-engine) | [Authority Enforcement](#authority-boundary-enforcement) | [Runtime Plane](#authenticated-runtime-execution-plane) | [Veto System](#veto-system) | [Enterprise](#enterprise-systems) | [API Reference](#api-reference) | [Documentation](#documentation)
 
@@ -22,11 +23,48 @@
 
 ---
 
+## What EVE AI Core Is
+
+EVE AI Core is an **AI Governance Platform (AIGP)** for **enterprise AI risk management**, built
+around **pre-execution runtime enforcement** rather than after-the-fact documentation. It sits in
+front of inference and adjudicates a proposed action *before* it executes, returning a deterministic
+**ALLOW / BLOCK / MODIFY** verdict — with no language model in the decision path — plus a
+cryptographically signed **Governed Decision Certificate** that a third party can verify offline.
+It carries executable policy packs and control mappings for **EU AI Act, NIST AI RMF, ISO/IEC 42001,
+and SR 26-2 model risk** programs. A framework mapping is not a certification.
+
+**Two planes.** Most AI governance platforms are a **Registry Plane**: they inventory AI systems,
+run intake and risk-tiering workflows, collect assessments, and report. Their unit of work is a
+*record*, on a human review cadence. EVE is a **Runtime Enforcement Plane**: an inline circuit
+breaker whose unit of work is a *single decision*, evaluated per request, fail-closed. A registry
+tells you whether your AI *should* comply; an enforcement plane makes it comply and emits the
+evidence. EVE is designed to run **beneath** a governance program — complementing a registry, not
+replacing one.
+
+**One engine, several categories.** The same enforcement-and-evidence core is bought under different
+names depending on the buyer:
+
+| Category | What it does here |
+|---|---|
+| **AI Governance Platform (AIGP)** | AI-system inventory, GRC assessments and approvals, control library, 31 deterministic policy packs |
+| **AI Guardrails / LLM Guardrails** | Content-safety, harmful-content, and PII policy packs applied pre- and post-generation |
+| **Agentic AI Security / AI Agent Firewall** | Agent gateway, MCP tool-call authorization, single-use signed execution certificates |
+| **AI Risk Management / Model Risk Management** | Fair-lending and ECOA packs, SR 26-2 control mappings, adverse-action coding |
+| **AI Compliance Automation (compliance-as-code)** | EU AI Act policy pack, OSCAL export, ISO/IEC 42001 clause mappings |
+| **AI Audit & Assurance / Decision Evidence** | EVE Proof signed certificates, offline Python + TypeScript verifiers, WORM audit chain, Merkle roots |
+| **Policy-as-Code / Authorization (PDP)** | OPA/Rego and Cedar policy import, pure-function veto core, propose→approve→execute action registry |
+
+These are **entry points to one product, not seven products.** The primary category — the thing EVE
+does that a registry-plane platform structurally does not — is deterministic runtime enforcement with
+independently verifiable evidence.
+
+---
+
 ## Why EVE AI Core Is Different
 
-Every other AI governance product works the same way: send a request to the model, receive a response, check whether the response is acceptable. That model is fundamentally reactive. It can catch bad outputs. It cannot prevent bad decisions.
+Most AI governance products work the same way: send a request to the model, receive a response, check whether the response is acceptable. That pattern is fundamentally reactive. It can catch bad outputs. It cannot prevent bad decisions. Runtime enforcement is an active area for the category — several vendors now ship agent-control or AI-security-posture features — so the question worth asking a vendor is not *whether* it enforces, but whether the verdict is deterministic, whether it lands before execution, and whether you can verify the record without trusting the vendor.
 
-EVE is architecturally different in four ways that no other platform replicates:
+EVE is architecturally different in four ways:
 
 **1. Deterministic, pre-execution governance.** EVE evaluates proposed actions against its charter, cognitive locks, and drift budget using pure functions — before the LLM generates anything. The veto engine (`core/governance/veto_core.py`) imports only Python stdlib (`re`, `sys`, `types`, `dataclasses`, `enum`, `typing`) — no third-party packages, and one deliberate load-time module freeze-guard. Zero I/O. Zero network calls. Zero LLM inference. Identical inputs always produce identical outputs. That is not a product claim — it is a purity contract enforced at the import boundary. The same code that runs on the server could run on an embedded system or FPGA.
 
@@ -34,9 +72,9 @@ EVE is architecturally different in four ways that no other platform replicates:
 
 **3. Fail-closed at every boundary.** No governance exception is caught and passed through. Any pipeline stage that throws an exception or returns a failure halts the request and returns a structured safe fallback. The Response Shield runs in strict mode by default: the factory rejects runtime permissive-mode overrides. Any shield exception blocks the chunk and latches permanently. There is no "try governance, fall back to ungoverned" path.
 
-**4. SILENT_DOWNGRADE_PROHIBITED.** An architectural invariant unique to EVE: the system cannot silently collapse an authoritative capability request to a lesser surface without structured disclosure. Any authority probe — a request for a signed certificate, a verified decision, or governed adjudication — triggers structured disclosure before a byte of content is generated. No capability is silently misrepresented.
+**4. SILENT_DOWNGRADE_PROHIBITED.** A named architectural invariant in EVE: the system cannot silently collapse an authoritative capability request to a lesser surface without structured disclosure. Any authority probe — a request for a signed certificate, a verified decision, or governed adjudication — triggers structured disclosure before a byte of content is generated. No capability is silently misrepresented.
 
-These four properties together make EVE the only governance control plane that is simultaneously pre-execution, deterministic, fail-closed end-to-end, and authority-boundary transparent — from the first request byte to the last audit record.
+These four properties hold simultaneously in EVE — pre-execution, deterministic, fail-closed end-to-end, and authority-boundary transparent, from the first request byte to the last audit record. Each is verifiable in the code paths cited above rather than asserted: the purity contract is enforced at the import boundary, and the evidence is verifiable offline without contacting EVE.
 
 ---
 
@@ -54,7 +92,7 @@ EVE sits between AI agents and their actions, enforcing policy before execution 
 
 ## Documentation
 
-- **[Sovereign Workforce Ecosystem — Technical Whitepaper](https://eveaicore.com/whitepaper)** — enterprise architecture specification covering the Peace Index health metric, the Sovereign Handshake governance protocol, the 7 immutable directives, the 5-phase immune system, and 8-layer defense-in-depth against identity dilution. Every threshold, formula, and codepath maps to a constant in `core/governance/veto_core.py`.
+- **[Sovereign Workforce Ecosystem — Technical Whitepaper](https://evecore.com/whitepaper)** — enterprise architecture specification covering the Peace Index health metric, the Sovereign Handshake governance protocol, the 7 immutable directives, the 5-phase immune system, and 8-layer defense-in-depth against identity dilution. Every threshold, formula, and codepath maps to a constant in `core/governance/veto_core.py`.
 
 ---
 
@@ -206,7 +244,7 @@ Each rule maps to a charter principle and is enforced by pattern-matching pure f
 
 CoreGuard is EVE's deterministic enforcement layer for regulated domains. Every decision produces a signed, verifiable **Governed Decision Certificate (GDC)** with HMAC-SHA256 attestation, policy versioning, and tamper-evident hash chains.
 
-**Live demo:** [eveaicore.com/coreguard](https://eveaicore.com/coreguard) — interactive adversarial testing with 3-layer enforcement reports.
+**Live demo:** [evecore.com/coreguard](https://evecore.com/coreguard) — interactive adversarial testing with 3-layer enforcement reports.
 
 | Metric | Value |
 |--------|-------|
@@ -472,7 +510,7 @@ share_private_information
 
 ### Firmware-Ready
 
-C header at `core/governance/veto_interface.h` (401 lines) defines the firmware API contract. 87 tests verify determinism, equivalence, and purity. The veto core carries no runtime dependencies — it can be compiled into an embedded system.
+C header at `core/governance/veto_interface.h` (401 lines) defines the firmware API contract. 78 tests (94 parametrized cases) verify determinism, equivalence, and purity. The veto core carries no runtime dependencies — it can be compiled into an embedded system.
 
 ### Adversarial Pillar Stack — 143 Total Pillars
 
@@ -698,7 +736,7 @@ Net effect: the agent can be wrong, but it cannot lie about having been governed
 
 **Endpoint:** `POST /api/chat/agent-loop` | **Tests:** 34 passing | **Budget:** 15 LLM calls max per loop
 
-**Live demo:** [eveaicore.com/cognitive-demo](https://eveaicore.com/cognitive-demo) — Agent Mode is ON by default.
+**Live demo:** [evecore.com/cognitive-demo](https://evecore.com/cognitive-demo) — Agent Mode is ON by default.
 
 ### Developer Governance Toggle
 
@@ -712,10 +750,10 @@ EVE ships four commercial products, each with a distinct buyer persona:
 
 | Product | Buyer | What It Does | Demo |
 |---------|-------|-------------|------|
-| **CoreGuard** | CISO, CTO | Deterministic governance gate for AI decisions. `POST /v1/decisions/evaluate` returns ALLOWED/BLOCKED/MODIFIED with signed GDC. Sub-20ms. | [/coreguard](https://eveaicore.com/coreguard) |
-| **EVE Proof** | CAO, GC, CCO | Volume-priced decision certification. Every governed decision produces a signed, verifiable Governed Decision Certificate. | [/proof](https://eveaicore.com/proof) |
-| **Model Update Firewall** | Compliance, Lending Ops | Pre-deployment model-change gating for regulated industries. Blocks protected-proxy variables, flags fair-lending violations. | [/fair-lending-demo](https://eveaicore.com/fair-lending-demo) |
-| **EVE AI Core** | CTO, Product | Hosted cognitive platform with governed agent loop, 5-layer memory, consciousness modeling, and identity continuity. | [/cognitive-demo](https://eveaicore.com/cognitive-demo) |
+| **CoreGuard** | CISO, CTO | Deterministic governance gate for AI decisions. `POST /v1/decisions/evaluate` returns ALLOWED/BLOCKED/MODIFIED with signed GDC. Sub-20ms. | [/coreguard](https://evecore.com/coreguard) |
+| **EVE Proof** | CAO, GC, CCO | Volume-priced decision certification. Every governed decision produces a signed, verifiable Governed Decision Certificate. | [/proof](https://evecore.com/proof) |
+| **Model Update Firewall** | Compliance, Lending Ops | Pre-deployment model-change gating for regulated industries. Blocks protected-proxy variables, flags fair-lending violations. | [/fair-lending-demo](https://evecore.com/fair-lending-demo) |
+| **EVE AI Core** | CTO, Product | Hosted cognitive platform with governed agent loop, 5-layer memory, consciousness modeling, and identity continuity. | [/cognitive-demo](https://evecore.com/cognitive-demo) |
 
 **Hosting model:** EVE is operated exclusively as a hosted service by EVE NeuroSystems. Customers access governance capabilities via API endpoints and web interface. No source code, engine binaries, or model weights are distributed. Dedicated VPC deployments available in customer-preferred AWS regions for regulated industries.
 
@@ -895,19 +933,33 @@ Full API catalog: [CLAUDE.md](CLAUDE.md) | Full architecture: [docs/ARCHITECTURE
 
 **5 AIMS hardware module specifications** with PolarFire SoC FPGA register maps.
 
-Full portfolio: [/ip](https://eveaicore.com/ip) | Licensing: [/governance-license](https://eveaicore.com/governance-license)
+Full portfolio: [/ip](https://evecore.com/ip) | Licensing: [/governance-license](https://evecore.com/governance-license)
 
 ---
 
 ## License
 
-MIT License. See [LICENSE](LICENSE).
+**This repository is MIT-licensed. The EVE platform is not.**
+
+| What | License |
+|---|---|
+| The contents of *this* repository — this README, the authorship-guard hooks in `.githooks/`, and `scripts/` | MIT — see [LICENSE](LICENSE) |
+| **EVE AI Core / EVE CoreGuard / EVE Proof** — the governance engine, policy packs, evidence layer, and hosted service described here | **Proprietary.** Commercial terms at [evecore.com/governance-license](https://evecore.com/governance-license) |
+| `eve-verify` — the standalone offline evidence verifiers (Python + TypeScript) | Apache-2.0, published separately |
+
+This repository contains **no EVE platform source code**. It is a public description
+of a proprietary system. The MIT grant above extends only to the files in this
+repository and confers no license to the EVE platform, its policy packs, or any
+patent-pending subject matter referenced in [Intellectual Property](#intellectual-property).
 
 ---
 
 **EVE NeuroSystems LLC** — Deterministic governance infrastructure for autonomous AI systems.
 Founded by **Jamaurice Holt** in Alpharetta, Georgia.
 
-Other companies can build agent loops. Other companies can build governance wrappers. No other company has combined pre-execution deterministic enforcement, three-plane structural separation, a first-authority transparency gate with SILENT_DOWNGRADE_PROHIBITED, an authenticated runtime execution plane with cryptographic replay protection, a firmware-ready veto core with zero stdlib dependencies, 143 total enforcement pillars, cryptographic proof chains across every decision, and a patent-pending IP moat into a single platform. That combination is unique to EVE.
+Agent loops and governance wrappers are widely available. EVE's distinction is the combination held in one platform: pre-execution deterministic enforcement, three-plane structural separation, a first-authority transparency gate with SILENT_DOWNGRADE_PROHIBITED, an authenticated runtime execution plane with cryptographic replay protection, a firmware-ready veto core with zero third-party dependencies, 143 total enforcement pillars, cryptographic proof chains across every decision, and a patent-pending IP portfolio.
 
-[eveaicore.com](https://eveaicore.com) | [IP Portfolio](https://eveaicore.com/ip) | [CoreGuard Demo](https://eveaicore.com/coreguard) | [Agent Loop Demo](https://eveaicore.com/cognitive-demo) | support@eveaicore.com
+<!-- Email stays on eveaicore.com. evecore.com is a Google Workspace *secondary*
+     domain, not an alias, so mail to @evecore.com bounces (NoSuchUser). Web links
+     use the canonical evecore.com apex; email addresses must not be migrated. -->
+[evecore.com](https://evecore.com) | [IP Portfolio](https://evecore.com/ip) | [CoreGuard Demo](https://evecore.com/coreguard) | [Agent Loop Demo](https://evecore.com/cognitive-demo) | support@eveaicore.com
