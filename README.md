@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="eve_logo.png" alt="EVE Logo" width="150" height="250"/>
+<img src="eve_logo.png" alt="EVE AI Core" width="200" height="200"/>
 
 # EVE AI Core — AI Governance Platform (AIGP)
 
